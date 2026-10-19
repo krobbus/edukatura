@@ -1,5 +1,28 @@
-const BASE = import.meta.env.VITE_API_URL || '';
-const TOKEN_KEY = 'lms.token';
+const PRODUCTION_API_URL = 'https://edukatura.onrender.com';
+const configuredBase = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, '');
+
+function isPublicApiUrl(value) {
+    if (!value) return false;
+
+    try {
+        const { hostname, protocol } = new URL(value);
+        return (
+            (protocol === 'http:' || protocol === 'https:') &&
+            hostname !== 'localhost' &&
+            !hostname.endsWith('.localhost') &&
+            !hostname.startsWith('127.') &&
+            hostname !== '[::1]'
+        );
+    } catch {
+        return false;
+    }
+}
+
+const BASE = import.meta.env.PROD
+    ? (isPublicApiUrl(configuredBase) ? configuredBase : PRODUCTION_API_URL)
+    : configuredBase || '';
+
+const TOKEN_KEY = 'key.token';
 
 export const tokenStore = {
     get: () => localStorage.getItem(TOKEN_KEY),
